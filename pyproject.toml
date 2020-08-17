@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "toml-cli"
+version = "0.1.0"
+description = ""
+authors = ["Marc Rijken"]
+license = "MIT"
+packages = [
+    { include = "toml_cli" },
+]
+
+[tool.poetry.scripts]
+toml = 'toml_cli:main'
+
+[tool.poetry.dependencies]
+python = "^3.7"
+typer = "^0.3.2"
+tomlkit = "^0.7.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.0.1"
+black = "^19.10b0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
