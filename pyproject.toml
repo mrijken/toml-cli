@@ -1,9 +1,11 @@
 [tool.poetry]
 name = "toml-cli"
-version = "0.1.0"
-description = ""
+version = "0.1.2"
+description = "Command line interface to read and write keys/values to/from toml files"
 authors = ["Marc Rijken"]
 license = "MIT"
+repository = "https://github.com/mrijken/toml-cli"
+readme = "README.md"
 packages = [
     { include = "toml_cli" },
 ]
@@ -15,7 +17,6 @@ toml = 'toml_cli:main'
 python = "^3.6"
 typer = "^0.3.2"
 tomlkit = "^0.7.0"
-poetry-dev = {path = "../poetry-dev/dist/poetry-dev-0.1.0.tar.gz"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.0.1"
