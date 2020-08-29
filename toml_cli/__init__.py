@@ -2,8 +2,8 @@ import pathlib
 from typing import Optional
 
 import tomlkit
+import tomlkit.exceptions
 import typer
-from typer.params import Option
 
 app = typer.Typer()
 
@@ -21,7 +21,7 @@ def get(key: Optional[str] = typer.Argument(None), toml_path: pathlib.Path = typ
 
 
 @app.command("set")
-def set(
+def set_(
     key: str,
     value: str,
     toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
