@@ -1,5 +1,7 @@
 # tom-cli
 
+![Build](https://github.com/mrijken/toml-cli/workflows/CI/badge.svg)
+
 Command line interface for toml files.
 
 This can be usefull for getting or setting parts of a toml file without an editor.
