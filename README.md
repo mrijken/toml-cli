@@ -1,6 +1,7 @@
 # tom-cli
 
 ![Build](https://github.com/mrijken/toml-cli/workflows/CI/badge.svg)
+![Hits](https://hitcounter.pythonanywhere.com/count/tag.svg?url=https%3A%2F%2Fgithub.com%2Fmrijken%toml-cli)
 
 Command line interface for toml files.
 
