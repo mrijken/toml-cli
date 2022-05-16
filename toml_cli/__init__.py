@@ -27,6 +27,7 @@ def set_(
     toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
     to_int: bool = typer.Option(False),
     to_float: bool = typer.Option(False),
+    to_bool: bool = typer.Option(False),
 ):
     """Set a value to a toml file"""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
@@ -41,6 +42,8 @@ def set_(
         value = int(value)
     if to_float:
         value = float(value)
+    if to_bool:
+        value = value.lower() in ['true', 'yes', 'y', '1']
 
     toml_part[key.split(".")[-1]] = value
 

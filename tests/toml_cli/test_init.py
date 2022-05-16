@@ -45,6 +45,7 @@ def test_set_value(tmp_path: pathlib.Path):
         """
 [person]
 name = "MyName"
+happy = false
 age = 12
 
 [person.education]
@@ -67,6 +68,10 @@ name = "University"
     result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.age", "15", "--to-float"])
     assert result.exit_code == 0
     assert "age = 15.0" in test_toml_path.read_text()
+
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.happy", "True", "--to-bool"])
+    assert result.exit_code == 0
+    assert "happy = true" in test_toml_path.read_text()
 
 
 def test_add_section(tmp_path: pathlib.Path):
