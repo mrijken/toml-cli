@@ -1,21 +1,23 @@
 import pathlib
-from typing import Optional
+from typing import Optional, List
 
 import tomlkit
 import tomlkit.exceptions
 import typer
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 
 @app.command("get")
-def get(key: Optional[str] = typer.Argument(None), toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))):
+def get(
+    key: Optional[List[str]] = typer.Argument(None),
+    toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))
+):
     """Get a value from a toml file"""
     toml_part = tomlkit.parse(toml_path.read_text())
 
-    if key is not None:
-        for key_part in key.split("."):
-            toml_part = toml_part[key_part]
+    for key_part in key:
+        toml_part = toml_part[key_part]
 
     typer.echo(toml_part)
 
@@ -66,20 +68,22 @@ def add_section(
 
 
 @app.command("unset")
-def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))):
+def unset(
+    key: Optional[List[str]] = typer.Argument(None),
+    toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))
+):
     """Unset a value from a toml file"""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
 
-    for key_part in key.split(".")[:-1]:
+    for key_part in key[:-1]:
         try:
             toml_part = toml_part[key_part]
         except tomlkit.exceptions.NonExistentKey:
             typer.echo(f"Key {key} can not unset", err=True)
 
-    del toml_part[key.split(".")[-1]]
+    del toml_part[key[-1]]
 
     toml_path.write_text(tomlkit.dumps(toml_file))
 
-
-def main():
+if __name__ == "__main__":
     app()
