@@ -6,7 +6,7 @@ import tomlkit.exceptions
 import typer
 import json
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 
 @app.command("get")
@@ -82,5 +82,5 @@ def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.
     toml_path.write_text(tomlkit.dumps(toml_file))
 
 
-def main():
+if __name__ == "__main__":
     app()
