@@ -9,6 +9,7 @@ from toml_cli import app
 
 runner = CliRunner()
 
+
 def normalized(item):
   if isinstance(item, dict):
       return sorted((key, normalized(values)) for key, values in item.items())
