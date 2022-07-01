@@ -4,8 +4,9 @@ from typing import Optional
 import tomlkit
 import tomlkit.exceptions
 import typer
+import json
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 
 @app.command("get")
@@ -17,7 +18,7 @@ def get(key: Optional[str] = typer.Argument(None), toml_path: pathlib.Path = typ
         for key_part in key.split("."):
             toml_part = toml_part[key_part]
 
-    typer.echo(toml_part)
+    typer.echo(json.dumps(toml_part))
 
 
 @app.command("set")
@@ -83,3 +84,6 @@ def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.
 
 def main():
     app()
+
+if __name__ == "__main__":
+    main()

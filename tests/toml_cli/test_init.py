@@ -1,12 +1,26 @@
 import pathlib
 
 import pytest
+import json
 
 from typer.testing import CliRunner
 
 from toml_cli import app
 
 runner = CliRunner()
+
+
+def normalized(item):
+  if isinstance(item, dict):
+      return sorted((key, normalized(values)) for key, values in item.items())
+  if isinstance(item, list):
+      return sorted(normalized(x) for x in item)
+  else:
+      return item
+
+
+def compare(item1, item2):
+    assert normalized(item1) == normalized(item2)
 
 
 def test_get_value(tmp_path: pathlib.Path):
@@ -22,21 +36,36 @@ name = "University"
 """
     )
 
-    result = runner.invoke(app, ["get", "--toml-path", str(test_toml_path), "person"])
-    assert result.exit_code == 0
-    assert "{'name': 'MyName', 'age': 12, 'education': {'name': 'University'}}" in result.stdout
+    def get(args):
+        result = runner.invoke(app, args)
+        assert result.exit_code == 0
+        return json.loads(result.stdout.strip())
 
-    result = runner.invoke(app, ["get", "--toml-path", str(test_toml_path), "person.education"])
-    assert result.exit_code == 0
-    assert "{'name': 'University'}" in result.stdout
+    compare(
+        get(["get", "--toml-path", str(test_toml_path), "person"]),
+        {
+            "name": "MyName",
+            "age": 12,
+            "education": {
+                "name": "University"
+            }
+        }
+    )
 
-    result = runner.invoke(app, ["get", "--toml-path", str(test_toml_path), "person.education.name"])
-    assert result.exit_code == 0
-    assert "University" in result.stdout
+    compare(
+        get(["get", "--toml-path", str(test_toml_path), "person.education"]),
+        { "name": "University" }
+    )
 
-    result = runner.invoke(app, ["get", "--toml-path", str(test_toml_path), "person.age"])
-    assert result.exit_code == 0
-    assert "12" in result.stdout
+    compare(
+        get(["get", "--toml-path", str(test_toml_path), "person.education.name"]),
+        "University"
+    )
+
+    compare(
+        get(["get", "--toml-path", str(test_toml_path), "person.age"]),
+        12
+    )
 
 
 def test_set_value(tmp_path: pathlib.Path):
