@@ -122,6 +122,7 @@ name = "University"
     assert result.exit_code == 0
     assert len(test_toml_path.read_text()) == 1  # just a newline
 
+
 def test_no_command():
     result = runner.invoke(app, [])
     assert result.exit_code == 0
