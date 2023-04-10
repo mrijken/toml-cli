@@ -29,6 +29,7 @@ def set_(
     to_int: bool = typer.Option(False),
     to_float: bool = typer.Option(False),
     to_bool: bool = typer.Option(False),
+    to_array: bool = typer.Option(False),
 ):
     """Set a value to a toml file"""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
@@ -45,6 +46,8 @@ def set_(
         value = float(value)
     if to_bool:
         value = value.lower() in ['true', 'yes', 'y', '1']
+    if to_array:
+        value = json.parse(value)
 
     toml_part[key.split(".")[-1]] = value
 
