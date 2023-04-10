@@ -47,7 +47,7 @@ def set_(
     if to_bool:
         value = value.lower() in ['true', 'yes', 'y', '1']
     if to_array:
-        value = json.parse(value)
+        value = json.loads(value)
 
     toml_part[key.split(".")[-1]] = value
 
