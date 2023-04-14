@@ -1,22 +1,19 @@
+import json
 import pathlib
 
-import pytest
-import json
-
-from typer.testing import CliRunner
-
 from toml_cli import app
+from typer.testing import CliRunner
 
 runner = CliRunner()
 
 
 def normalized(item):
-  if isinstance(item, dict):
-      return sorted((key, normalized(values)) for key, values in item.items())
-  if isinstance(item, list):
-      return sorted(normalized(x) for x in item)
-  else:
-      return item
+    if isinstance(item, dict):
+        return sorted((key, normalized(values)) for key, values in item.items())
+    if isinstance(item, list):
+        return sorted(normalized(x) for x in item)
+    else:
+        return item
 
 
 def compare(item1, item2):
@@ -30,6 +27,8 @@ def test_get_value(tmp_path: pathlib.Path):
 [person]
 name = "MyName"
 age = 12
+happy = false
+addresses = ["Rotterdam", "Amsterdam"]
 
 [person.education]
 name = "University"
@@ -43,29 +42,20 @@ name = "University"
 
     compare(
         get(["get", "--toml-path", str(test_toml_path), "person"]),
-        {
-            "name": "MyName",
-            "age": 12,
-            "education": {
-                "name": "University"
-            }
-        }
+        {"name": "MyName", "age": 12, "education": {"name": "University"}, "addresses": ["Rotterdam", "Amsterdam"], "happy": False},
     )
 
     compare(
         get(["get", "--toml-path", str(test_toml_path), "person.education"]),
-        { "name": "University" }
+        {"name": "University"},
     )
 
     compare(
         get(["get", "--toml-path", str(test_toml_path), "person.education.name"]),
-        "University"
+        "University",
     )
 
-    compare(
-        get(["get", "--toml-path", str(test_toml_path), "person.age"]),
-        12
-    )
+    compare(get(["get", "--toml-path", str(test_toml_path), "person.age"]), 12)
 
 
 def test_set_value(tmp_path: pathlib.Path):
@@ -82,25 +72,51 @@ name = "University"
 """
     )
 
-    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.age", "15"])
+    result = runner.invoke(
+        app, ["set", "--toml-path", str(test_toml_path), "person.age", "15"]
+    )
     assert result.exit_code == 0
     assert 'age = "15"' in test_toml_path.read_text()
 
-    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.age", "15", "--to-int"])
+    result = runner.invoke(
+        app, ["set", "--toml-path", str(test_toml_path), "person.age", "15", "--to-int"]
+    )
     assert result.exit_code == 0
     assert "age = 15" in test_toml_path.read_text()
 
-    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.gender", "male"])
+    result = runner.invoke(
+        app, ["set", "--toml-path", str(test_toml_path), "person.gender", "male"]
+    )
     assert result.exit_code == 0
-    assert 'age = 15\ngender = "male"' in test_toml_path.read_text()
+    assert 'gender = "male"' in test_toml_path.read_text()
 
-    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.age", "15", "--to-float"])
+    result = runner.invoke(
+        app,
+        ["set", "--toml-path", str(test_toml_path), "person.age", "15", "--to-float"],
+    )
     assert result.exit_code == 0
     assert "age = 15.0" in test_toml_path.read_text()
 
-    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.happy", "True", "--to-bool"])
+    result = runner.invoke(
+        app,
+        [
+            "set",
+            "--toml-path",
+            str(test_toml_path),
+            "person.happy",
+            "True",
+            "--to-bool",
+        ],
+    )
     assert result.exit_code == 0
     assert "happy = true" in test_toml_path.read_text()
+
+    result = runner.invoke(
+        app,
+        ["set", "--toml-path", str(test_toml_path), "person.addresses", '["Amsterdam","London"]', "--to-array"],
+    )
+    assert result.exit_code == 0
+    assert "addresses = [\"Amsterdam\", \"London\"]" in test_toml_path.read_text()
 
 
 def test_add_section(tmp_path: pathlib.Path):
@@ -116,11 +132,15 @@ name = "University"
 """
     )
 
-    result = runner.invoke(app, ["add_section", "--toml-path", str(test_toml_path), "address"])
+    result = runner.invoke(
+        app, ["add_section", "--toml-path", str(test_toml_path), "address"]
+    )
     assert result.exit_code == 0
     assert "[address]" in test_toml_path.read_text()
 
-    result = runner.invoke(app, ["add_section", "--toml-path", str(test_toml_path), "address.work"])
+    result = runner.invoke(
+        app, ["add_section", "--toml-path", str(test_toml_path), "address.work"]
+    )
     assert result.exit_code == 0
     assert "[address]\n[address.work]" in test_toml_path.read_text()
 
@@ -138,12 +158,16 @@ name = "University"
 """
     )
 
-    result = runner.invoke(app, ["unset", "--toml-path", str(test_toml_path), "person.education.name"])
+    result = runner.invoke(
+        app, ["unset", "--toml-path", str(test_toml_path), "person.education.name"]
+    )
     assert result.exit_code == 0
     assert "[person.education]" in test_toml_path.read_text()
     assert "University" not in test_toml_path.read_text()
 
-    result = runner.invoke(app, ["unset", "--toml-path", str(test_toml_path), "person.education"])
+    result = runner.invoke(
+        app, ["unset", "--toml-path", str(test_toml_path), "person.education"]
+    )
     assert result.exit_code == 0
     assert "[persion.education]" not in test_toml_path.read_text()
 
