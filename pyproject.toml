@@ -1,9 +1,8 @@
 [tool.poetry]
 name = "toml-cli"
-version = "0.4.0"
+version = "0.4.2"
 description = "Command line interface to read and write keys/values to/from toml files"
-authors = ["AI Center of Excellence, de Volksbank (NL) <aicoe@devolksbank.nl>"]
-#authors = ["Marc Rijken"]
+authors = ["Marc Rijken"]
 license = "MIT"
 repository = "https://github.com/mrijken/toml-cli"
 readme = "README.md"
