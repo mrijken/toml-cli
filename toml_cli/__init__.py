@@ -21,7 +21,7 @@ def get(
         for key_part in key.split("."):
             toml_part = toml_part[key_part]
 
-    typer.echo(json.dumps(toml_part))
+    typer.echo(toml_part)
 
 
 @app.command("set")
@@ -32,7 +32,10 @@ def set_(
     to_int: bool = typer.Option(False),
     to_float: bool = typer.Option(False),
     to_bool: bool = typer.Option(False),
-    to_array: bool = typer.Option(False, help="accepts a valid json array and covert it to toml, ie [\"Amsterdam\",\"Rotterdam\"]"),
+    to_array: bool = typer.Option(
+        False,
+        help='accepts a valid json array and covert it to toml, ie ["Amsterdam","Rotterdam"]',
+    ),
 ):
     """Set a value to a toml file"""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())

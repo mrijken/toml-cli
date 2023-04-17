@@ -1,23 +1,23 @@
-import json
 import pathlib
 
-from toml_cli import app
 from typer.testing import CliRunner
+
+from toml_cli import app
 
 runner = CliRunner()
 
 
-def normalized(item):
-    if isinstance(item, dict):
-        return sorted((key, normalized(values)) for key, values in item.items())
-    if isinstance(item, list):
-        return sorted(normalized(x) for x in item)
-    else:
-        return item
+# def normalized(item):
+#     if isinstance(item, dict):
+#         return sorted((key, normalized(values)) for key, values in item.items())
+#     if isinstance(item, list):
+#         return sorted(normalized(x) for x in item)
+#     else:
+#         return item
 
 
-def compare(item1, item2):
-    assert normalized(item1) == normalized(item2)
+# def compare(item1, item2):
+#     assert normalized(eval(item1)) == normalized(item2)
 
 
 def test_get_value(tmp_path: pathlib.Path):
@@ -38,24 +38,24 @@ name = "University"
     def get(args):
         result = runner.invoke(app, args)
         assert result.exit_code == 0
-        return json.loads(result.stdout.strip())
+        return result.stdout.strip()
 
-    compare(
-        get(["get", "--toml-path", str(test_toml_path), "person"]),
-        {"name": "MyName", "age": 12, "education": {"name": "University"}, "addresses": ["Rotterdam", "Amsterdam"], "happy": False},
+    assert get(["get", "--toml-path", str(test_toml_path), "person"]) == (
+        "{'name': 'MyName', 'age': 12, 'happy': False, "
+        "'addresses': ['Rotterdam', 'Amsterdam'], 'education': {'name': 'University'}}"
     )
 
-    compare(
-        get(["get", "--toml-path", str(test_toml_path), "person.education"]),
-        {"name": "University"},
+    assert (
+        get(["get", "--toml-path", str(test_toml_path), "person.education"])
+        == "{'name': 'University'}"
     )
 
-    compare(
-        get(["get", "--toml-path", str(test_toml_path), "person.education.name"]),
-        "University",
+    assert (
+        get(["get", "--toml-path", str(test_toml_path), "person.education.name"])
+        == "University"
     )
 
-    compare(get(["get", "--toml-path", str(test_toml_path), "person.age"]), 12)
+    assert get(["get", "--toml-path", str(test_toml_path), "person.age"]) == "12"
 
 
 def test_set_value(tmp_path: pathlib.Path):
@@ -113,10 +113,17 @@ name = "University"
 
     result = runner.invoke(
         app,
-        ["set", "--toml-path", str(test_toml_path), "person.addresses", '["Amsterdam","London"]', "--to-array"],
+        [
+            "set",
+            "--toml-path",
+            str(test_toml_path),
+            "person.addresses",
+            '["Amsterdam","London"]',
+            "--to-array",
+        ],
     )
     assert result.exit_code == 0
-    assert "addresses = [\"Amsterdam\", \"London\"]" in test_toml_path.read_text()
+    assert 'addresses = ["Amsterdam", "London"]' in test_toml_path.read_text()
 
 
 def test_add_section(tmp_path: pathlib.Path):
@@ -180,4 +187,5 @@ def test_no_command():
     result = runner.invoke(app, [])
     assert result.exit_code == 0
     assert "--help" in result.stdout
+    assert "Commands" in result.stdout
     assert "Commands" in result.stdout
