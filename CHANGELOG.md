@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2023-05-10
+
+### Added
+- Add support for getting one item of an array
+
 ## [0.4.2] - 2023-4-15
 ### Fixed
 - Fix quoting on get command ([#26](https://github.com/mrijken/toml-cli/issues/26))
