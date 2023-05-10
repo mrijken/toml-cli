@@ -17,6 +17,7 @@ continuous development steps.
 ## Get a value
 
 `toml get --toml-path pyproject.toml tool.poetry.name`
+`toml get --toml-path pyproject.toml tool.poetry.authors[0]`
 
 ## Set a value
 

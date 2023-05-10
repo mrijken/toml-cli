@@ -57,6 +57,8 @@ name = "University"
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.age"]) == "12"
 
+    assert get(["get", "--toml-path", str(test_toml_path), "person.addresses[1]"]) == "Amsterdam"
+
 
 def test_set_value(tmp_path: pathlib.Path):
     test_toml_path = tmp_path / "test.toml"
