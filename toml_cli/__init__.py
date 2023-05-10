@@ -5,6 +5,7 @@ from typing import Optional
 import tomlkit
 import tomlkit.exceptions
 import typer
+import re
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -19,7 +20,13 @@ def get(
 
     if key is not None:
         for key_part in key.split("."):
-            toml_part = toml_part[key_part]
+            match = re.search(r"(?P<key>.*?)\[(?P<index>\d+)\]", key_part)
+            if match:
+                key = match.group("key")
+                index = int(match.group("index"))
+                toml_part = toml_part[key][index]
+            else:
+                toml_part = toml_part[key_part]
 
     typer.echo(toml_part)
 
