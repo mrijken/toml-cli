@@ -2,7 +2,7 @@
 name = "toml-cli"
 version = "0.4.2"
 description = "Command line interface to read and write keys/values to/from toml files"
-authors = ["Marc Rijken"]
+authors = ["Marc Rijken <marc@rijken.org>"]
 license = "MIT"
 repository = "https://github.com/mrijken/toml-cli"
 readme = "README.md"
