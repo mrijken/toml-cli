@@ -4,6 +4,9 @@ from typer.testing import CliRunner
 
 from toml_cli import app
 
+import sys
+import pytest
+
 runner = CliRunner()
 
 
@@ -57,7 +60,10 @@ name = "University"
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.age"]) == "12"
 
-    assert get(["get", "--toml-path", str(test_toml_path), "person.addresses[1]"]) == "Amsterdam"
+    assert (
+        get(["get", "--toml-path", str(test_toml_path), "person.addresses[1]"])
+        == "Amsterdam"
+    )
 
 
 def test_set_value(tmp_path: pathlib.Path):
@@ -185,9 +191,72 @@ name = "University"
     assert len(test_toml_path.read_text()) == 1  # just a newline
 
 
+def test_update_dependency_list(tmp_path: pathlib.Path):
+    test_toml_path = tmp_path / "test.toml"
+    test_toml_path.write_text(
+        """
+[project]
+name = "TestPackage"
+dependencies = [
+    "pytest",
+    "typer>=0.3.2",
+]
+"""
+    )
+
+    result = runner.invoke(
+        app,
+        [
+            "update_dependency_list",
+            "--toml-path",
+            str(test_toml_path),
+            "project.dependencies",
+            "pytest",
+            "7.3.0",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "dependencies = [" in test_toml_path.read_text()
+    assert "pytest>=7.3.0" in test_toml_path.read_text()
+
+    result = runner.invoke(
+        app,
+        [
+            "update_dependency_list",
+            "--toml-path",
+            str(test_toml_path),
+            "project.dependencies",
+            "pytest",
+            "==7.3.0",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "dependencies = [" in test_toml_path.read_text()
+    assert "pytest==7.3.0" in test_toml_path.read_text()
+
+    result = runner.invoke(
+        app,
+        [
+            "update_dependency_list",
+            "--toml-path",
+            str(test_toml_path),
+            "project.dependencies",
+            "typer",
+            "0.2.8",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "dependencies = [" in test_toml_path.read_text()
+    assert "typer>=0.2.8" in test_toml_path.read_text()
+
+
 def test_no_command():
     result = runner.invoke(app, [])
     assert result.exit_code == 0
     assert "--help" in result.stdout
     assert "Commands" in result.stdout
     assert "Commands" in result.stdout
+
+
+if __name__ == "__main__":
+    pytest.main(sys.argv)
