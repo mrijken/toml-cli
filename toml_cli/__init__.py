@@ -84,9 +84,7 @@ def add_section(
 
 
 @app.command("unset")
-def unset(
-    key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))
-):
+def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))):
     """Unset a value from a toml file"""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
 
