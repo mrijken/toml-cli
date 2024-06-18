@@ -62,7 +62,14 @@ def set_(
     if to_array:
         value = json.loads(value)
 
-    toml_part[key.split(".")[-1]] = value
+    last_key = key.split(".")[-1]
+    match = re.search(r"(?P<table>.*?)\[(?P<index>\d+)\]", last_key)
+    if match:
+        table = match.group("table")
+        index = int(match.group("index"))
+        toml_part[table][index] = value
+    else:
+        toml_part[last_key] = value
 
     toml_path.write_text(tomlkit.dumps(toml_file))
 
