@@ -51,7 +51,8 @@ def set_(
         try:
             toml_part = toml_part[key_part]
         except tomlkit.exceptions.NonExistentKey:
-            typer.echo(f"Key {key} can not set", err=True)
+            typer.echo(f"error: non-existent key '{key}' can not be set to value '{value}'", err=True)
+            exit(1)
 
     if to_int:
         value = int(value)

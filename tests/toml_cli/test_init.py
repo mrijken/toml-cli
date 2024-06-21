@@ -68,6 +68,9 @@ name = "University"
 """
     )
 
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.KEY_THAT_DOES_NOT_EXIST.name", "15"])
+    assert result.exit_code == 1
+
     result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.age", "15"])
     assert result.exit_code == 0
     assert 'age = "15"' in test_toml_path.read_text()
