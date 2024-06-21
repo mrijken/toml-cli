@@ -28,7 +28,7 @@ def get(
             else:
                 toml_part = toml_part[key_part]
 
-    typer.echo(toml_part)
+    typer.echo(toml_part.unwrap())
 
 
 @app.command("set")
