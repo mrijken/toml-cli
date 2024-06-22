@@ -32,6 +32,14 @@ addresses = ["Rotterdam", "Amsterdam"]
 
 [person.education]
 name = "University"
+
+[[person.vehicles]]
+model = "Golf"
+year = 2020
+
+[[person.vehicles]]
+model = "Prius"
+year = 2016
 """
     )
 
@@ -42,7 +50,8 @@ name = "University"
 
     assert get(["get", "--toml-path", str(test_toml_path), "person"]) == (
         "{'name': 'MyName', 'age': 12, 'happy': False, "
-        "'addresses': ['Rotterdam', 'Amsterdam'], 'education': {'name': 'University'}}"
+        "'addresses': ['Rotterdam', 'Amsterdam'], 'education': {'name': 'University'}, "
+        "'vehicles': [{'model': 'Golf', 'year': 2020}, {'model': 'Prius', 'year': 2016}]}"
     )
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.education"]) == "{'name': 'University'}"
@@ -51,7 +60,20 @@ name = "University"
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.age"]) == "12"
 
+    assert get(["get", "--toml-path", str(test_toml_path), "person.addresses"]) == "['Rotterdam', 'Amsterdam']"
+
     assert get(["get", "--toml-path", str(test_toml_path), "person.addresses[1]"]) == "Amsterdam"
+
+    assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles"]) == (
+        "["
+            "{'model': 'Golf', 'year': 2020}, "
+            "{'model': 'Prius', 'year': 2016}"
+        "]"
+    )
+
+    assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles[1]"]) == "{'model': 'Prius', 'year': 2016}"
+
+    assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles[1].model"]) == "Prius"
 
 
 def test_set_value(tmp_path: pathlib.Path):
