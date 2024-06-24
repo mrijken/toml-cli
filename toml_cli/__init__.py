@@ -73,7 +73,10 @@ def set_(
             exit(1)
 
         index = int(match.group("index"))
-        toml_part[index] = value
+        if len(toml_part) <= index:
+            toml_part.insert(index, value)
+        else:
+            toml_part[index] = value
     else:
         toml_part[last_key] = value
 

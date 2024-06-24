@@ -123,6 +123,14 @@ name = "University"
     assert result.exit_code == 0
     assert 'skills = ["python", "toml"]' in test_toml_path.read_text()
 
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.skills[2]", "git"])
+    assert result.exit_code == 0
+    assert 'skills = ["python", "toml", "git"]' in test_toml_path.read_text()
+
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.skills[1337]", "h4ck3rm4n"])
+    assert result.exit_code == 0
+    assert 'skills = ["python", "toml", "git", "h4ck3rm4n"]' in test_toml_path.read_text()
+
 
 def test_add_section(tmp_path: pathlib.Path):
     test_toml_path = tmp_path / "test.toml"
