@@ -116,6 +116,9 @@ name = "University"
     assert result.exit_code == 0
     assert 'addresses = ["Amsterdam", "London"]' in test_toml_path.read_text()
 
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.KEY_THAT_DOES_NOT_EXIST[0]", "git"])
+    assert result.exit_code == 1
+
     result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.skills[1]", "toml"])
     assert result.exit_code == 0
     assert 'skills = ["python", "toml"]' in test_toml_path.read_text()
