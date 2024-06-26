@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "toml-cli"
-version = "0.6.1"
+version = "0.7.0"
 description = "Command line interface to read and write keys/values to/from toml files"
 authors = ["Marc Rijken <marc@rijken.org>"]
 license = "MIT"
