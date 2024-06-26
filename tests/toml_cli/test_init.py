@@ -84,6 +84,7 @@ def test_set_value(tmp_path: pathlib.Path):
 name = "MyName"
 happy = false
 age = 12
+skills = ["python", "pip"]
 
 [person.education]
 name = "University"
@@ -139,6 +140,21 @@ name = "University"
     )
     assert result.exit_code == 0
     assert 'addresses = ["Amsterdam", "London"]' in test_toml_path.read_text()
+
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.KEY_THAT_DOES_NOT_EXIST[0]", "git"])
+    assert result.exit_code == 1
+
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.skills[1]", "toml"])
+    assert result.exit_code == 0
+    assert 'skills = ["python", "toml"]' in test_toml_path.read_text()
+
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.skills[2]", "git"])
+    assert result.exit_code == 0
+    assert 'skills = ["python", "toml", "git"]' in test_toml_path.read_text()
+
+    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.skills[1337]", "h4ck3rm4n"])
+    assert result.exit_code == 0
+    assert 'skills = ["python", "toml", "git", "h4ck3rm4n"]' in test_toml_path.read_text()
 
 
 def test_add_section(tmp_path: pathlib.Path):

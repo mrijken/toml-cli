@@ -22,6 +22,9 @@ continuous development steps.
 ## Set a value
 
 `toml set --toml-path pyproject.toml tool.poetry.version 0.2.0`
+`toml set --toml-path pyproject.toml tool.poetry.authors[0] "Marc Rijken <marc@rijken.org>"`
+
+When the index exists, the item is changed.  Otherwise, the item will be added to the list.
 
 ## Add a section
 

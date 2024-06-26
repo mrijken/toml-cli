@@ -63,7 +63,23 @@ def set_(
     if to_array:
         value = json.loads(value)
 
-    toml_part[key.split(".")[-1]] = value
+    last_key = key.split(".")[-1] # 'key' may access an array with index, example: tool.poetry.authors[0]
+    match = re.search(r"(?P<array>.*?)\[(?P<index>\d+)\]", last_key)
+    if match:
+        array = match.group("array")
+        try:
+            toml_part = toml_part[array]
+        except tomlkit.exceptions.NonExistentKey:
+            typer.echo(f"error: non-existent array '{array}'", err=True)
+            exit(1)
+
+        index = int(match.group("index"))
+        if len(toml_part) <= index:
+            toml_part.insert(index, value)
+        else:
+            toml_part[index] = value
+    else:
+        toml_part[last_key] = value
 
     toml_path.write_text(tomlkit.dumps(toml_file))
 
