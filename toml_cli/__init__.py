@@ -1,11 +1,11 @@
 import json
 import pathlib
+import re
 from typing import Optional
 
 import tomlkit
 import tomlkit.exceptions
 import typer
-import re
 
 app = typer.Typer(no_args_is_help=True)
 
@@ -14,6 +14,7 @@ app = typer.Typer(no_args_is_help=True)
 def get(
     key: Optional[str] = typer.Argument(None),
     toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
+    default: Optional[str] = typer.Argument(None),
 ):
     """Get a value from a toml file"""
     toml_part = tomlkit.parse(toml_path.read_text())
@@ -55,15 +56,17 @@ def set_(
             exit(1)
 
     if to_int:
-        value = int(value)
-    if to_float:
-        value = float(value)
-    if to_bool:
-        value = value.lower() in ["true", "yes", "y", "1"]
-    if to_array:
-        value = json.loads(value)
+        parsed_value = int(value)
+    elif to_float:
+        parsed_value = float(value)
+    elif to_bool:
+        parsed_value = value.lower() in ["true", "yes", "y", "1"]
+    elif to_array:
+        parsed_value = json.loads(value)
+    else:
+        parsed_value = value
 
-    last_key = key.split(".")[-1] # 'key' may access an array with index, example: tool.poetry.authors[0]
+    last_key = key.split(".")[-1]  # 'key' may access an array with index, example: tool.poetry.authors[0]
     match = re.search(r"(?P<array>.*?)\[(?P<index>\d+)\]", last_key)
     if match:
         array = match.group("array")
@@ -75,11 +78,11 @@ def set_(
 
         index = int(match.group("index"))
         if len(toml_part) <= index:
-            toml_part.insert(index, value)
+            toml_part.insert(index, parsed_value)
         else:
-            toml_part[index] = value
+            toml_part[index] = parsed_value
     else:
-        toml_part[last_key] = value
+        toml_part[last_key] = parsed_value
 
     toml_path.write_text(tomlkit.dumps(toml_file))
 
