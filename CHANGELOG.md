@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Get, Change and add items of an array
+- Add default value for get command
 
 ### Fixed
 

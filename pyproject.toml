@@ -1,3 +1,4 @@
+la = "test"
 [tool.poetry]
 name = "toml-cli"
 version = "0.6.1"

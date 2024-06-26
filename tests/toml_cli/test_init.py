@@ -43,9 +43,9 @@ year = 2016
 """
     )
 
-    def get(args):
+    def get(args, exit_code=0):
         result = runner.invoke(app, args)
-        assert result.exit_code == 0
+        assert result.exit_code == exit_code
         return result.stdout.strip()
 
     assert get(["get", "--toml-path", str(test_toml_path), "person"]) == (
@@ -60,20 +60,25 @@ year = 2016
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.age"]) == "12"
 
+    assert get(["get", "--toml-path", str(test_toml_path), "person.hobby", "--default", "programming"]) == "programming"
+
     assert get(["get", "--toml-path", str(test_toml_path), "person.addresses"]) == "['Rotterdam', 'Amsterdam']"
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.addresses[1]"]) == "Amsterdam"
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles"]) == (
-        "["
-            "{'model': 'Golf', 'year': 2020}, "
-            "{'model': 'Prius', 'year': 2016}"
-        "]"
+        "[" "{'model': 'Golf', 'year': 2020}, " "{'model': 'Prius', 'year': 2016}" "]"
     )
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles[1]"]) == "{'model': 'Prius', 'year': 2016}"
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles[1].model"]) == "Prius"
+
+    assert get(["get", "--toml-path", str(test_toml_path), "person.not_existing_key"], 1)
+
+    assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles[122]"], 1)
+
+    assert get(["get", "--toml-path", str(test_toml_path), "person.not_existing_key[122]"], 1)
 
 
 def test_set_value(tmp_path: pathlib.Path):
@@ -91,7 +96,9 @@ name = "University"
 """
     )
 
-    result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.KEY_THAT_DOES_NOT_EXIST.name", "15"])
+    result = runner.invoke(
+        app, ["set", "--toml-path", str(test_toml_path), "person.KEY_THAT_DOES_NOT_EXIST.name", "15"]
+    )
     assert result.exit_code == 1
 
     result = runner.invoke(app, ["set", "--toml-path", str(test_toml_path), "person.age", "15"])

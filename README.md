@@ -18,6 +18,7 @@ continuous development steps.
 
 `toml get --toml-path pyproject.toml tool.poetry.name`
 `toml get --toml-path pyproject.toml tool.poetry.authors[0]`
+`toml get --toml-path pyproject.toml tool.poetry.name --default marc`
 
 ## Set a value
 

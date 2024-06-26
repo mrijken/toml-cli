@@ -14,7 +14,7 @@ app = typer.Typer(no_args_is_help=True)
 def get(
     key: Optional[str] = typer.Argument(None),
     toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
-    default: Optional[str] = typer.Argument(None),
+    default: Optional[str] = typer.Option(None),
 ):
     """Get a value from a toml file"""
     toml_part = tomlkit.parse(toml_path.read_text())
@@ -25,9 +25,33 @@ def get(
             if match:
                 key = match.group("key")
                 index = int(match.group("index"))
-                toml_part = toml_part[key][index]
+                try:
+                    toml_part = toml_part[key]
+                except KeyError:
+                    if default:
+                        typer.echo(default)
+                        return
+
+                    typer.echo(f"error: key '{key}' not found", err=True)
+                    exit(1)
+
+                try:
+                    toml_part = toml_part[index]
+                except IndexError:
+                    if default:
+                        typer.echo(default)
+                        return
+
+                    typer.echo(f"error: index '{index}' not found", err=True)
+                    exit(1)
             else:
-                toml_part = toml_part[key_part]
+                if key_part not in toml_part and default:
+                    toml_part[key_part] = default
+                try:
+                    toml_part = toml_part[key_part]
+                except KeyError:
+                    typer.echo(f"error: key '{key_part}' not found", err=True)
+                    exit(1)
 
     typer.echo(toml_part.unwrap())
 
