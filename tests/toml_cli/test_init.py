@@ -169,6 +169,11 @@ name = "University"
     assert "age = 15" in test_toml_path.read_text()
 
     result = runner.invoke(
+        app, ["set", "--toml-path", str(test_toml_path), "person.age", "a", "--to-int"]
+    )
+    assert result.exit_code != 0
+
+    result = runner.invoke(
         app, ["set", "--toml-path", str(test_toml_path), "person.gender", "male"]
     )
     assert result.exit_code == 0
@@ -180,6 +185,12 @@ name = "University"
     )
     assert result.exit_code == 0
     assert "age = 15.0" in test_toml_path.read_text()
+
+    result = runner.invoke(
+        app,
+        ["set", "--toml-path", str(test_toml_path), "person.age", "a", "--to-float"],
+    )
+    assert result.exit_code != 0
 
     result = runner.invoke(
         app,
