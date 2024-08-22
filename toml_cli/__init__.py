@@ -28,7 +28,7 @@ def get(
                 try:
                     toml_part = toml_part[key]
                 except KeyError:
-                    if default:
+                    if default is not None:
                         typer.echo(default)
                         return
 
@@ -38,14 +38,14 @@ def get(
                 try:
                     toml_part = toml_part[index]
                 except IndexError:
-                    if default:
+                    if default is not None:
                         typer.echo(default)
                         return
 
                     typer.echo(f"error: index '{index}' not found", err=True)
                     exit(1)
             else:
-                if key_part not in toml_part and default:
+                if key_part not in toml_part and default is not None:
                     toml_part[key_part] = default
                 try:
                     toml_part = toml_part[key_part]
@@ -59,7 +59,7 @@ def get(
 @app.command("set")
 def set_(
     key: str,
-    value: str,
+    value: str | int | float | bool,
     toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
     to_int: bool = typer.Option(False),
     to_float: bool = typer.Option(False),
@@ -76,7 +76,10 @@ def set_(
         try:
             toml_part = toml_part[key_part]
         except tomlkit.exceptions.NonExistentKey:
-            typer.echo(f"error: non-existent key '{key}' can not be set to value '{value}'", err=True)
+            typer.echo(
+                f"error: non-existent key '{key}' can not be set to value '{value}'",
+                err=True,
+            )
             exit(1)
 
     if to_int:
@@ -90,7 +93,9 @@ def set_(
     else:
         parsed_value = value
 
-    last_key = key.split(".")[-1]  # 'key' may access an array with index, example: tool.poetry.authors[0]
+    last_key = key.split(".")[
+        -1
+    ]  # 'key' may access an array with index, example: tool.poetry.authors[0]
     match = re.search(r"(?P<array>.*?)\[(?P<index>\d+)\]", last_key)
     if match:
         array = match.group("array")
@@ -128,7 +133,9 @@ def add_section(
 
 
 @app.command("unset")
-def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))):
+def unset(
+    key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))
+):
     """Unset a value from a toml file"""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
 
