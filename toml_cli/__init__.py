@@ -16,7 +16,7 @@ def get(
     toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
     default: Optional[str] = typer.Option(None),
 ):
-    """Get a value from a toml file"""
+    """Get a value from a toml file."""
     toml_part = tomlkit.parse(toml_path.read_text())
 
     if key is not None:
@@ -27,31 +27,31 @@ def get(
                 index = int(match.group("index"))
                 try:
                     toml_part = toml_part[key]
-                except KeyError:
-                    if default:
+                except KeyError as err:
+                    if default is not None:
                         typer.echo(default)
                         return
 
                     typer.echo(f"error: key '{key}' not found", err=True)
-                    exit(1)
+                    raise typer.Exit(code=1) from err
 
                 try:
                     toml_part = toml_part[index]
-                except IndexError:
-                    if default:
+                except IndexError as err:
+                    if default is not None:
                         typer.echo(default)
                         return
 
                     typer.echo(f"error: index '{index}' not found", err=True)
-                    exit(1)
+                    raise typer.Exit(code=1) from err
             else:
-                if key_part not in toml_part and default:
+                if key_part not in toml_part and default is not None:
                     toml_part[key_part] = default
                 try:
                     toml_part = toml_part[key_part]
-                except KeyError:
+                except KeyError as err:
                     typer.echo(f"error: key '{key_part}' not found", err=True)
-                    exit(1)
+                    raise typer.Exit(code=1) from err
 
     typer.echo(toml_part.unwrap())
 
@@ -69,36 +69,45 @@ def set_(
         help='accepts a valid json array and covert it to toml, ie ["Amsterdam","Rotterdam"]',
     ),
 ):
-    """Set a value to a toml file"""
+    """Set a value to a toml file."""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
 
     for key_part in key.split(".")[:-1]:
         try:
             toml_part = toml_part[key_part]
-        except tomlkit.exceptions.NonExistentKey:
-            typer.echo(f"error: non-existent key '{key}' can not be set to value '{value}'", err=True)
-            exit(1)
+        except tomlkit.exceptions.NonExistentKey as err:
+            typer.echo(
+                f"error: non-existent key '{key}' can not be set to value '{value}'",
+                err=True,
+            )
+            raise typer.Exit(code=1) from err
+    try:
+        parsed_value: str | int | float | bool | list
+        if to_int:
+            parsed_value = int(value)
+        elif to_float:
+            parsed_value = float(value)
+        elif to_bool:
+            parsed_value = value.lower() in ["true", "yes", "y", "1"]
+        elif to_array:
+            parsed_value = json.loads(value)
+        else:
+            parsed_value = value
+    except ValueError as err:
+        typer.echo(f"error: '{value}' can't be cast to selected type", err=True)
+        raise typer.Exit(code=1) from err
 
-    if to_int:
-        parsed_value = int(value)
-    elif to_float:
-        parsed_value = float(value)
-    elif to_bool:
-        parsed_value = value.lower() in ["true", "yes", "y", "1"]
-    elif to_array:
-        parsed_value = json.loads(value)
-    else:
-        parsed_value = value
-
-    last_key = key.split(".")[-1]  # 'key' may access an array with index, example: tool.poetry.authors[0]
+    last_key = key.split(".")[
+        -1
+    ]  # 'key' may access an array with index, example: tool.poetry.authors[0]
     match = re.search(r"(?P<array>.*?)\[(?P<index>\d+)\]", last_key)
     if match:
         array = match.group("array")
         try:
             toml_part = toml_part[array]
-        except tomlkit.exceptions.NonExistentKey:
+        except tomlkit.exceptions.NonExistentKey as err:
             typer.echo(f"error: non-existent array '{array}'", err=True)
-            exit(1)
+            raise typer.Exit(code=1) from err
 
         index = int(match.group("index"))
         if len(toml_part) <= index:
@@ -116,7 +125,7 @@ def add_section(
     key: str,
     toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
 ):
-    """Add a section with the given key"""
+    """Add a section with the given key."""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
 
     for key_part in key.split("."):
@@ -128,8 +137,10 @@ def add_section(
 
 
 @app.command("unset")
-def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))):
-    """Unset a value from a toml file"""
+def unset(
+    key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))
+):
+    """Unset a value from a toml file."""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
 
     for key_part in key.split(".")[:-1]:

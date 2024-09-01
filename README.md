@@ -1,14 +1,12 @@
 # toml-cli
 
 ![Build](https://github.com/mrijken/toml-cli/workflows/CI/badge.svg)
-![Hits](https://hitcounter.pythonanywhere.com/count/tag.svg?url=https%3A%2F%2Fgithub.com%2Fmrijken%toml-cli)
 
 Command line interface for toml files.
 
 This can be usefull for getting or setting parts of a toml file without an editor.
 Which can be convinient when values have to be read by a script for example in
 continuous development steps.
-
 
 ## Install
 
