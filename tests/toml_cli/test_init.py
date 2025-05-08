@@ -129,6 +129,46 @@ year = 2016
     )
 
 
+def test_search(tmp_path: pathlib.Path):
+    test_toml_path = tmp_path / "test.toml"
+    test_toml_path.write_text(
+        """
+[person]
+name = "MyName"
+age = 12
+happy = false
+addresses = ["Rotterdam", "Amsterdam"]
+
+[person.education]
+name = "University"
+
+[[person.vehicles]]
+model = "Golf"
+year = 2020
+
+[[person.vehicles]]
+model = "Prius"
+year = 2016
+"""
+    )
+
+    result = runner.invoke(app, ["search", "--toml-path", str(test_toml_path), "person.vehicles[*].model"])
+    assert result.exit_code == 0
+    assert result.stdout.strip() == (
+        "['Golf', 'Prius']"
+    )
+
+    result = runner.invoke(app, ["search", "--toml-path", str(test_toml_path), "person.vehicles[*].not_existing_property"])
+    assert result.exit_code == 0
+    assert result.stdout.strip() == (
+        "No result found"
+    )
+
+    result = runner.invoke(app, ["search", "--toml-path", str(test_toml_path), "wrong-expression"])
+    assert result.exit_code == 1
+    assert "error: invalid jmespath expression" in result.stdout
+
+
 def test_set_value(tmp_path: pathlib.Path):
     test_toml_path = tmp_path / "test.toml"
     test_toml_path.write_text(

@@ -16,6 +16,7 @@ python = ">=3.8"
 typer = ">=0.3.2"
 tomlkit = ">=0.12.1"
 regex = ">=2020.7.14"
+jmespath = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
