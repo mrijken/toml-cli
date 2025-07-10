@@ -81,6 +81,7 @@ def set_(
                 err=True,
             )
             raise typer.Exit(code=1) from err
+
     try:
         parsed_value: str | int | float | bool | list
         if to_int:
@@ -97,9 +98,7 @@ def set_(
         typer.echo(f"error: '{value}' can't be cast to selected type", err=True)
         raise typer.Exit(code=1) from err
 
-    last_key = key.split(".")[
-        -1
-    ]  # 'key' may access an array with index, example: tool.poetry.authors[0]
+    last_key = key.split(".")[-1]  # 'key' may access an array with index, example: tool.poetry.authors[0]
     match = re.search(r"(?P<array>.*?)\[(?P<index>\d+)\]", last_key)
     if match:
         array = match.group("array")
@@ -137,9 +136,7 @@ def add_section(
 
 
 @app.command("unset")
-def unset(
-    key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))
-):
+def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))):
     """Unset a value from a toml file."""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
 
