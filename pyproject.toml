@@ -12,14 +12,14 @@ packages = [{ include = "toml_cli" }]
 toml = 'toml_cli:main'
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.10"
 typer = ">=0.3.2"
-tomlkit = ">=0.12.1"
+tomlkit = ">=0.13.3"
 regex = ">=2020.7.14"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.1.1"
-ruff = "^0.4"
+pytest = "^8.4.1"
+ruff = "^0.12"
 
 [tool.ruff]
 line-length = 120
