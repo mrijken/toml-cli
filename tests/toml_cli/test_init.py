@@ -100,11 +100,10 @@ year = 2016
 
     assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles[1].model"]) == "Prius"
 
-    assert get(["get", "--toml-path", str(test_toml_path), "person.not_existing_key"], 1)
+    assert get(["get", "--toml-path", str(test_toml_path), "person.not_existing_key"], 1) == ""
+    assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles[122]"], 1) == ""
 
-    assert get(["get", "--toml-path", str(test_toml_path), "person.vehicles[122]"], 1)
-
-    assert get(["get", "--toml-path", str(test_toml_path), "person.not_existing_key[122]"], 1)
+    assert get(["get", "--toml-path", str(test_toml_path), "person.not_existing_key[122]"], 1) == ""
 
 
 def test_set_value(tmp_path: pathlib.Path):
@@ -288,7 +287,7 @@ name = "University"
 
 def test_no_command():
     result = runner.invoke(app, [])
-    assert result.exit_code == 0
+    assert result.exit_code == 2
     assert "--help" in result.stdout
     assert "Commands" in result.stdout
     assert "Commands" in result.stdout
