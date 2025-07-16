@@ -7,6 +7,9 @@ import tomlkit
 import tomlkit.exceptions
 import typer
 
+import jmespath
+
+
 app = typer.Typer(no_args_is_help=True)
 
 
@@ -149,6 +152,23 @@ def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.
     del toml_part[key.split(".")[-1]]
 
     toml_path.write_text(tomlkit.dumps(toml_file))
+
+
+@app.command("search")
+def search(
+    jmespath_expression: str,
+    toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
+):
+    """Search for a value in a toml file using JMESPath query."""
+    toml_data = tomlkit.parse(toml_path.read_text())
+
+    try:
+        result = jmespath.search(jmespath_expression, toml_data) or "No result found"
+    except jmespath.exceptions.JMESPathError as err:
+        typer.echo(f"error: invalid jmespath expression - {err}", err=True)
+        raise typer.Exit(code=1) from err
+
+    typer.echo(result)
 
 
 def main():

@@ -20,6 +20,10 @@ continuous development steps.
 
 `toml get --toml-path pyproject.toml tool.poetry.name --default marc`
 
+## Search with [JMESPath](https://jmespath.org/)
+
+`toml search --toml-path pyproject.toml tool.uv.index[*].name`
+
 ## Set a value
 
 `toml set --toml-path pyproject.toml tool.poetry.version 0.2.0`
