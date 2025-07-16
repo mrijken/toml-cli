@@ -49,6 +49,7 @@ jobs:
         poetry run pytest tests --junit-xml=tests-results.xml
 
     - name: Render test results
+      if: success() || failure()
       uses: dorny/test-reporter@v1
       continue-on-error: true
       with:
