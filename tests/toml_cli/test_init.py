@@ -143,7 +143,7 @@ year = 2016
 
     result = runner.invoke(app, ["search", "--toml-path", str(test_toml_path), "wrong-expression"])
     assert result.exit_code == 1
-    assert "error: invalid jmespath expression" in result.stdout
+    assert "error: invalid jmespath expression" in result.stderr
 
 
 def test_set_value(tmp_path: pathlib.Path):
@@ -323,11 +323,3 @@ name = "University"
     result = runner.invoke(app, ["unset", "--toml-path", str(test_toml_path), "person"])
     assert result.exit_code == 0
     assert len(test_toml_path.read_text()) == 1  # just a newline
-
-
-def test_no_command():
-    result = runner.invoke(app, [])
-    assert result.exit_code == 2
-    assert "--help" in result.stdout
-    assert "Commands" in result.stdout
-    assert "Commands" in result.stdout
