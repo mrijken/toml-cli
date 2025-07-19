@@ -20,24 +20,21 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
+  
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
 
-    - name: Install pipx and Poetry
-      run: |
-        pip install pipx &&
-        pipx ensurepath &&
+    - name: "Set up Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version-file: ".python-version"      
 
-        python --version &&
-
-        pipx install poetry==1.8.4 &&
-        poetry --version
-
-    - name: Install dependencies
-      run: |
-        poetry install
-
+    - name: Install the project
+      run: uv sync --locked --all-extras --dev
+        
     - name: Run tests
       run: |
-        poetry run pytest tests --junit-xml=tests-results.xml
+        uv run pytest tests --junit-xml=tests-results.xml
 
     - name: Render test results
       if: success() || failure()
