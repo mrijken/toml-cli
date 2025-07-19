@@ -13,10 +13,19 @@ import jmespath
 app = typer.Typer(no_args_is_help=True)
 
 
+DEFAULT_TOML_PATH = pathlib.Path("config.toml")
+
+
+def path_callback(value: pathlib.Path):
+    if not value.exists():
+        raise typer.BadParameter(f"{value} does not exists")
+    return value
+
+
 @app.command("get")
 def get(
     key: Optional[str] = typer.Argument(None),
-    toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
+    toml_path: pathlib.Path = typer.Option(DEFAULT_TOML_PATH, callback=path_callback),
     default: Optional[str] = typer.Option(None),
 ):
     """Get a value from a toml file."""
@@ -63,7 +72,7 @@ def get(
 def set_(
     key: str,
     value: str,
-    toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
+    toml_path: pathlib.Path = typer.Option(DEFAULT_TOML_PATH, callback=path_callback),
     to_int: bool = typer.Option(False),
     to_float: bool = typer.Option(False),
     to_bool: bool = typer.Option(False),
@@ -125,7 +134,7 @@ def set_(
 @app.command("add_section")
 def add_section(
     key: str,
-    toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
+    toml_path: pathlib.Path = typer.Option(DEFAULT_TOML_PATH, callback=path_callback),
 ):
     """Add a section with the given key."""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
@@ -139,7 +148,10 @@ def add_section(
 
 
 @app.command("unset")
-def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml"))):
+def unset(
+    key: str,
+    toml_path: pathlib.Path = typer.Option(DEFAULT_TOML_PATH, callback=path_callback),
+):
     """Unset a value from a toml file."""
     toml_part = toml_file = tomlkit.parse(toml_path.read_text())
 
@@ -157,7 +169,7 @@ def unset(key: str, toml_path: pathlib.Path = typer.Option(pathlib.Path("config.
 @app.command("search")
 def search(
     jmespath_expression: str,
-    toml_path: pathlib.Path = typer.Option(pathlib.Path("config.toml")),
+    toml_path: pathlib.Path = typer.Option(DEFAULT_TOML_PATH, callback=path_callback),
 ):
     """Search for a value in a toml file using JMESPath query."""
     toml_data = tomlkit.parse(toml_path.read_text())

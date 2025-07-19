@@ -1,6 +1,6 @@
 [project]
 name = "toml-cli"
-version = "0.7.0"
+version = "0.8.0"
 description = "Command line interface to read and write keys/values to/from toml files"
 requires-python = ">=3.10"
 dependencies = [
@@ -14,11 +14,10 @@ scripts = { toml = 'toml_cli:main'}
 
 [tool.ruff]
 line-length = 120
-target-version = "py38"
+target-version = "py310"
 
 [tool.ruff.lint.isort]
 force-single-line = true
-known-first-party = ["pytest_nlcov"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["toml_cli"]
