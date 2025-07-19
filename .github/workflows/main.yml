@@ -16,28 +16,29 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Install ruff
+      uses: astral-sh/ruff-action@v3
+      
+    - name: Ruff check
+      run: ruff check
+      
+    - name: Ruff format
+      run: ruff format --check
+
+    - name: "Set up Python"
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version-file: ".python-version"      
 
-    - name: Install pipx and Poetry
-      run: |
-        pip install pipx &&
-        pipx ensurepath &&
-
-        python --version &&
-
-        pipx install poetry==1.8.4 &&
-        poetry --version
-
-    - name: Install dependencies
-      run: |
-        poetry install
-
+    - name: Install the project
+      run: uv sync --locked --all-extras --dev
+        
     - name: Run tests
       run: |
-        poetry run pytest tests --junit-xml=tests-results.xml
+        uv run pytest tests --junit-xml=tests-results.xml
 
     - name: Render test results
       if: success() || failure()
