@@ -131,15 +131,13 @@ year = 2016
 
     result = runner.invoke(app, ["search", "--toml-path", str(test_toml_path), "person.vehicles[*].model"])
     assert result.exit_code == 0
-    assert result.stdout.strip() == (
-        "['Golf', 'Prius']"
-    )
+    assert result.stdout.strip() == ("['Golf', 'Prius']")
 
-    result = runner.invoke(app, ["search", "--toml-path", str(test_toml_path), "person.vehicles[*].not_existing_property"])
-    assert result.exit_code == 0
-    assert result.stdout.strip() == (
-        "No result found"
+    result = runner.invoke(
+        app, ["search", "--toml-path", str(test_toml_path), "person.vehicles[*].not_existing_property"]
     )
+    assert result.exit_code == 0
+    assert result.stdout.strip() == ("No result found")
 
     result = runner.invoke(app, ["search", "--toml-path", str(test_toml_path), "wrong-expression"])
     assert result.exit_code == 1
