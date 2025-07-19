@@ -1,7 +1,9 @@
 [project]
 name = "toml-cli"
-version = "0.8.0"
+version = "0.8.1"
 description = "Command line interface to read and write keys/values to/from toml files"
+readme = "README"
+license = "MIT AND (Apache-2.0 OR BSD-2-Clause)"
 requires-python = ">=3.10"
 dependencies = [
     "jmespath>=1.0.1",
@@ -11,6 +13,9 @@ dependencies = [
 ]
 authors = [{ name = "Marc Rijken", email = "marc@rijken.org" }]
 scripts = { toml = 'toml_cli:main'}
+
+[project.urls]
+Repository = "https://github.com/mrijken/toml-cli"
 
 [tool.ruff]
 line-length = 120
