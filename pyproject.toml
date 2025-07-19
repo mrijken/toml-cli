@@ -2,7 +2,7 @@
 name = "toml-cli"
 version = "0.8.1"
 description = "Command line interface to read and write keys/values to/from toml files"
-readme = "README"
+readme = "README.md"
 license = "MIT AND (Apache-2.0 OR BSD-2-Clause)"
 requires-python = ">=3.10"
 dependencies = [
