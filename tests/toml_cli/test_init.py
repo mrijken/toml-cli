@@ -7,19 +7,6 @@ from toml_cli import app
 runner = CliRunner()
 
 
-# def normalized(item):
-#     if isinstance(item, dict):
-#         return sorted((key, normalized(values)) for key, values in item.items())
-#     if isinstance(item, list):
-#         return sorted(normalized(x) for x in item)
-#     else:
-#         return item
-
-
-# def compare(item1, item2):
-#     assert normalized(eval(item1)) == normalized(item2)
-
-
 def test_get_value(tmp_path: pathlib.Path):
     test_toml_path = tmp_path / "test.toml"
     test_toml_path.write_text(
