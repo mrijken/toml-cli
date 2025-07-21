@@ -10,7 +10,13 @@ continuous development steps.
 
 ## Install
 
+Install via
+
 `pip install toml-cli`
+
+or
+
+`uv tool install toml-cli`
 
 ## Get a value
 
