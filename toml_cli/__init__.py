@@ -2,8 +2,7 @@ import json
 import pathlib
 import re
 
-import tomlkit
-import tomlkit.exceptions
+import tomlrt
 import typer
 
 import jmespath
@@ -21,6 +20,16 @@ def path_callback(value: pathlib.Path):
     return value
 
 
+def read_toml(toml_path: pathlib.Path) -> tomlrt.Document:
+    with toml_path.open("rb") as toml_file:
+        return tomlrt.load(toml_file)
+
+
+def write_toml(document: tomlrt.Document, toml_path: pathlib.Path) -> None:
+    with toml_path.open("wb") as toml_file:
+        tomlrt.dump(document, toml_file)
+
+
 @app.command("get")
 def get(
     key: str | None = typer.Argument(None),
@@ -28,7 +37,7 @@ def get(
     default: str | None = typer.Option(None),
 ):
     """Get a value from a toml file."""
-    toml_part = tomlkit.parse(toml_path.read_text())
+    toml_part = read_toml(toml_path)
 
     if key is not None:
         for key_part in key.split("."):
@@ -64,7 +73,7 @@ def get(
                     typer.echo(f"error: key '{key_part}' not found", err=True)
                     raise typer.Exit(code=1) from err
 
-    typer.echo(toml_part.unwrap() if hasattr(toml_part, "unwrap") else toml_part)
+    typer.echo(toml_part)
 
 
 @app.command("set")
@@ -81,12 +90,12 @@ def set_(
     ),
 ):
     """Set a value to a toml file."""
-    toml_part = toml_file = tomlkit.parse(toml_path.read_text())
+    toml_part = toml_file = read_toml(toml_path)
 
     for key_part in key.split(".")[:-1]:
         try:
             toml_part = toml_part[key_part]
-        except tomlkit.exceptions.NonExistentKey as err:
+        except KeyError as err:
             typer.echo(
                 f"error: non-existent key '{key}' can not be set to value '{value}'",
                 err=True,
@@ -115,7 +124,7 @@ def set_(
         array = match.group("array")
         try:
             toml_part = toml_part[array]
-        except tomlkit.exceptions.NonExistentKey as err:
+        except KeyError as err:
             typer.echo(f"error: non-existent array '{array}'", err=True)
             raise typer.Exit(code=1) from err
 
@@ -127,7 +136,7 @@ def set_(
     else:
         toml_part[last_key] = parsed_value
 
-    toml_path.write_text(tomlkit.dumps(toml_file))
+    write_toml(toml_file, toml_path)
 
 
 @app.command("add_section")
@@ -136,14 +145,15 @@ def add_section(
     toml_path: pathlib.Path = typer.Option(DEFAULT_TOML_PATH, callback=path_callback),
 ):
     """Add a section with the given key."""
-    toml_part = toml_file = tomlkit.parse(toml_path.read_text())
+    toml_file = read_toml(toml_path)
 
-    for key_part in key.split("."):
-        if key_part not in toml_part:
-            toml_part[key_part] = tomlkit.table()
-        toml_part = toml_part[key_part]
+    try:
+        toml_file.ensure_table(key)
+    except tomlrt.TOMLError as err:
+        typer.echo(f"error: can not add section '{key}' - {err}", err=True)
+        raise typer.Exit(code=1) from err
 
-    toml_path.write_text(tomlkit.dumps(toml_file))
+    write_toml(toml_file, toml_path)
 
 
 @app.command("unset")
@@ -152,17 +162,17 @@ def unset(
     toml_path: pathlib.Path = typer.Option(DEFAULT_TOML_PATH, callback=path_callback),
 ):
     """Unset a value from a toml file."""
-    toml_part = toml_file = tomlkit.parse(toml_path.read_text())
+    toml_part = toml_file = read_toml(toml_path)
 
     for key_part in key.split(".")[:-1]:
         try:
             toml_part = toml_part[key_part]
-        except tomlkit.exceptions.NonExistentKey:
+        except KeyError:
             typer.echo(f"Key {key} can not unset", err=True)
 
     del toml_part[key.split(".")[-1]]
 
-    toml_path.write_text(tomlkit.dumps(toml_file))
+    write_toml(toml_file, toml_path)
 
 
 @app.command("search")
@@ -171,7 +181,7 @@ def search(
     toml_path: pathlib.Path = typer.Option(DEFAULT_TOML_PATH, callback=path_callback),
 ):
     """Search for a value in a toml file using JMESPath query."""
-    toml_data = tomlkit.parse(toml_path.read_text())
+    toml_data = read_toml(toml_path)
 
     try:
         result = jmespath.search(jmespath_expression, toml_data) or "No result found"
