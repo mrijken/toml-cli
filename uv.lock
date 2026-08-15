@@ -252,7 +252,7 @@ source = { editable = "." }
 dependencies = [
     { name = "jmespath" },
     { name = "regex" },
-    { name = "tomlkit" },
+    { name = "tomlrt" },
     { name = "typer" },
 ]
 
@@ -266,7 +266,7 @@ dev = [
 requires-dist = [
     { name = "jmespath", specifier = ">=1.0.1" },
     { name = "regex", specifier = ">=2020.7.14" },
-    { name = "tomlkit", specifier = ">=0.13.3" },
+    { name = "tomlrt", specifier = ">=2.2.2" },
     { name = "typer", specifier = ">=0.16.0" },
 ]
 
@@ -316,12 +316,15 @@ wheels = [
 ]
 
 [[package]]
-name = "tomlkit"
-version = "0.13.3"
+name = "tomlrt"
+version = "2.2.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/cc/18/0bbf3884e9eaa38819ebe46a7bd25dcd56b67434402b66a58c4b8e552575/tomlkit-0.13.3.tar.gz", hash = "sha256:430cf247ee57df2b94ee3fbe588e71d362a941ebb545dec29b53961d61add2a1", size = 185207 }
+dependencies = [
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/90/87/e562c97681fba128969622bfbf41e0dba0be6339ab4d943c6946414d8303/tomlrt-2.2.2.tar.gz", hash = "sha256:1ab5c1187c2e2f4ee0dd078142f531efbd623aaaed09c350bc9ee8150cb23c4f", size = 406967 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bd/75/8539d011f6be8e29f339c42e633aae3cb73bffa95dd0f9adec09b9c58e85/tomlkit-0.13.3-py3-none-any.whl", hash = "sha256:c89c649d79ee40629a9fda55f8ace8c6a1b42deb912b2a8fd8d942ddadb606b0", size = 38901 },
+    { url = "https://files.pythonhosted.org/packages/7e/45/8d2905d2388fab4f62b4d45ed3b7b71a40e2d35fa2f513d071607f5ec13f/tomlrt-2.2.2-py3-none-any.whl", hash = "sha256:7edf2a55a5afccc76b971add88e4163f80bceefbfee3697b5566f17963cd1200", size = 144429 },
 ]
 
 [[package]]

@@ -8,7 +8,7 @@ requires-python = ">=3.10"
 dependencies = [
     "jmespath>=1.0.1",
     "regex>=2020.7.14",
-    "tomlkit>=0.13.3",
+    "tomlrt>=2.2.2",
     "typer>=0.16.0",
 ]
 authors = [{ name = "Marc Rijken", email = "marc@rijken.org" }]

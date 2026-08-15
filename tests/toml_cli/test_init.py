@@ -262,7 +262,7 @@ name = "University"
 
     result = runner.invoke(app, ["add_section", "--toml-path", str(test_toml_path), "address.work"])
     assert result.exit_code == 0
-    assert "[address]\n[address.work]" in test_toml_path.read_text()
+    assert "[address]\n\n[address.work]" in test_toml_path.read_text()
 
 
 def test_set_in_out_of_order_table(tmp_path: pathlib.Path):
@@ -308,4 +308,4 @@ name = "University"
 
     result = runner.invoke(app, ["unset", "--toml-path", str(test_toml_path), "person"])
     assert result.exit_code == 0
-    assert len(test_toml_path.read_text()) == 1  # just a newline
+    assert test_toml_path.read_text() == ""

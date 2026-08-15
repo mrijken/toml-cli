@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## \[Unreleased\]
+
+### Changed
+
+- Replace tomlkit with tomlrt as the TOML reader/writer
+- Read and write toml files in binary mode, so that CRLF line endings are preserved
+
 ## \[0.8.2\]
 
 ### Fixed
